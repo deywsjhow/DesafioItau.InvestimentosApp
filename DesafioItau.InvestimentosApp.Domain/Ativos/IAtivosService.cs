@@ -8,6 +8,6 @@ namespace DesafioItau.InvestimentosApp.Domain.Ativos
 {
     public interface IAtivosService
     {
-        Task<AtivosResponse?> GetAtivo(string codigo);
+        Task<ServiceResult<AtivosResponse>> GetAtivo(string codigo);
     }
 }

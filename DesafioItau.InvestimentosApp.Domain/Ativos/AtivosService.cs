@@ -1,41 +1,31 @@
 ﻿
-
 using DesafioItau.InvestimentosApp.Repository.DbAtivosContext;
 
 namespace DesafioItau.InvestimentosApp.Domain.Ativos
 {
     public class AtivosService(IAtivosContext ativosContext, ICotacoesContext cotacoesContext) : IAtivosService
     {
-        public async Task<AtivosResponse?> GetAtivo(string codigo)
+        public async Task<ServiceResult<AtivosResponse>> GetAtivo(string codigo)
         {
-            var AtivosResponse = new AtivosResponse();
+            if (string.IsNullOrWhiteSpace(codigo))
+                return ServiceResult<AtivosResponse>.Fail("Código do ativo não informado.");
 
-            if (codigo is null)
-                return new AtivosResponse();
+            var ativo = await ativosContext.GetAtivo(codigo);
+            if (ativo is null)
+                return ServiceResult<AtivosResponse>.Fail("Ativo não encontrado.");
 
-            //chama get ativo para recuperar as infos do ativo
-            var ret = await ativosContext.GetAtivo(codigo);
+            var cotacao = await cotacoesContext.GetCotacao(ativo.id);
+            if (cotacao is null)
+                return ServiceResult<AtivosResponse>.Fail("Nenhuma cotação encontrada para o ativo informado.");
 
-            if (ret is null)
-                return new AtivosResponse();
+            var response = new AtivosResponse
+            {
+                Ativo = cotacao.id_ativo.ToString(),
+                Preco = cotacao.preco_unitario,
+                DataHora = cotacao.data_hora
+            };
 
-            //Recuperado o id do ativo para fazer a chamada a tabela de cotacoes
-            int idAtivo = ret.id;
-
-            //Chama tabela de cotação para recuperar os valores a serem devolvidos
-            var retCotacoes = await cotacoesContext.GetCotacao(idAtivo);
-
-            if (retCotacoes is null)
-                return new AtivosResponse();
-
-            AtivosResponse.Ativo = retCotacoes.id_ativo.ToString();
-            AtivosResponse.Preco = retCotacoes.preco_unitario;
-            AtivosResponse.DataHora = retCotacoes.data_hora;
-
-
-            return AtivosResponse;
+            return ServiceResult<AtivosResponse>.Ok(response);
         }
-
-
     }
 }

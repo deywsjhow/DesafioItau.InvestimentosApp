@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using DesafioItau.InvestimentosApp.Controllers;
 using DesafioItau.InvestimentosApp.Domain.Ativos;
 using System.Threading.Tasks;
+
 public class AtivosControllerTests
 {
     [Fact]
@@ -12,10 +13,8 @@ public class AtivosControllerTests
         // Arrange
         var mockService = new Mock<IAtivosService>();
         var fakeResponse = new AtivosResponse { Ativo = "ITSA4", Preco = 10.55M };
-
         mockService.Setup(s => s.GetAtivo("ITSA4"))
-                   .ReturnsAsync(fakeResponse);
-
+                   .ReturnsAsync(ServiceResult<AtivosResponse>.Ok(fakeResponse));
         var controller = new AtivosController();
 
         // Act
@@ -25,6 +24,7 @@ public class AtivosControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var value = Assert.IsType<AtivosResponse>(okResult.Value);
         Assert.Equal("ITSA4", value.Ativo);
+        Assert.Equal(10.55M, value.Preco);
     }
 
     [Fact]
@@ -33,43 +33,52 @@ public class AtivosControllerTests
         // Arrange
         var mockService = new Mock<IAtivosService>();
         mockService.Setup(s => s.GetAtivo("VAZIO"))
-                   .ReturnsAsync((AtivosResponse?)null);
-
+                   .ReturnsAsync(ServiceResult<AtivosResponse>.Fail("Não encontrado"));
         var controller = new AtivosController();
 
         // Act
         var result = await controller.ConsultaUltimaCotacaoAtivo("VAZIO", mockService.Object);
 
         // Assert
-        Assert.IsType<BadRequestObjectResult>(result);
+        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal("Não encontrado", badRequest.Value);
     }
 
-    [Fact]
-    public async Task ConsultaUltimaCotacaoAtivo_ReturnsBadRequest_WhenCodigoIsNullOrEmpty()
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    public async Task ConsultaUltimaCotacaoAtivo_ReturnsBadRequest_WhenCodigoIsNullOrEmpty(string? codigo)
     {
+        // Arrange
         var mockService = new Mock<IAtivosService>();
+        mockService.Setup(s => s.GetAtivo(It.IsAny<string>()))
+                   .ReturnsAsync(ServiceResult<AtivosResponse>.Fail("Código inválido"));
+
         var controller = new AtivosController();
 
-        var resultNull = await controller.ConsultaUltimaCotacaoAtivo(null!, mockService.Object);
-        var resultEmpty = await controller.ConsultaUltimaCotacaoAtivo("", mockService.Object);
+        // Act
+        var result = await controller.ConsultaUltimaCotacaoAtivo(codigo!, mockService.Object);
 
-        Assert.IsType<BadRequestObjectResult>(resultNull);
-        Assert.IsType<BadRequestObjectResult>(resultEmpty);
+        // Assert
+        var badRequest = Assert.IsType<BadRequestObjectResult>(result);
+        Assert.Equal("Código inválido", badRequest.Value);
     }
 
     [Fact]
     public async Task ConsultaUltimaCotacaoAtivo_CallsGetAtivo_Once()
     {
+        // Arrange
         var mockService = new Mock<IAtivosService>();
         var codigo = "ITSA4";
-        mockService.Setup(s => s.GetAtivo(codigo)).ReturnsAsync(new AtivosResponse());
+        mockService.Setup(s => s.GetAtivo(codigo))
+                   .ReturnsAsync(ServiceResult<AtivosResponse>.Ok(new AtivosResponse()));
 
         var controller = new AtivosController();
 
+        // Act
         await controller.ConsultaUltimaCotacaoAtivo(codigo, mockService.Object);
 
+        // Assert
         mockService.Verify(s => s.GetAtivo(codigo), Times.Once());
     }
-
-
 }

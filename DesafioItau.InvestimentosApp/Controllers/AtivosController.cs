@@ -1,28 +1,23 @@
 ﻿using DesafioItau.InvestimentosApp.Domain.Ativos;
-using DesafioItau.InvestimentosApp.Repository.DbAtivosContext;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;using Microsoft.AspNetCore.Mvc;
 
 namespace DesafioItau.InvestimentosApp.Controllers
 {
     [ApiController]
-    [Route("api/ativos/")]
-    public class AtivosController : Controller
+    [Route("api/ativos")]
+    public class AtivosController : ControllerBase
     {
-
         [HttpGet("{codigo}/ultima-cotacao")]
-        [ProducesResponseType(typeof(AtivosResponse), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(AtivosResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> ConsultaUltimaCotacaoAtivo(string codigo, IAtivosService ativosService)
         {
-            //implementar a chamada do ativosService
             var result = await ativosService.GetAtivo(codigo);
 
-            if (result is null)
-                return BadRequest(result);
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
-            return Ok(result);
+            return Ok(result.Data);
         }
     }
 }
