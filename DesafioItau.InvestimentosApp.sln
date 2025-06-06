@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.36105.23 d17.13
+VisualStudioVersion = 17.13.36105.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesafioItau.InvestimentosApp", "DesafioItau.InvestimentosApp\DesafioItau.InvestimentosApp.csproj", "{5EA010F8-3037-4084-A84D-0B7DB9E890CE}"
 EndProject
@@ -16,6 +16,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Repository", "Repository", "{12653F8A-E501-4B14-865D-B9828D4397CA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesafioItau.InvestimentosApp.Repository", "DesafioItau.InvestimentosApp.Repository\DesafioItau.InvestimentosApp.Repository.csproj", "{1CBE7786-E579-4523-AA71-CC319EA29E15}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{56526028-5F97-48CF-85B8-24871FE57DA9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesafioItau.InvestimentosApp.Test", "DesafioItau.InvestimentosApp.Test\DesafioItau.InvestimentosApp.Test.csproj", "{12437E7E-3084-4512-98BF-7923DEF29661}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,10 @@ Global
 		{1CBE7786-E579-4523-AA71-CC319EA29E15}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CBE7786-E579-4523-AA71-CC319EA29E15}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CBE7786-E579-4523-AA71-CC319EA29E15}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12437E7E-3084-4512-98BF-7923DEF29661}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12437E7E-3084-4512-98BF-7923DEF29661}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12437E7E-3084-4512-98BF-7923DEF29661}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12437E7E-3084-4512-98BF-7923DEF29661}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -47,6 +55,7 @@ Global
 		{03944D2F-06E4-4D1F-8056-B5AC699B2354} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{2254B903-E5B2-4CE4-90F2-7A33109698DB} = {450016A0-76D1-438A-B8CF-7EEE77D3EBF1}
 		{1CBE7786-E579-4523-AA71-CC319EA29E15} = {12653F8A-E501-4B14-865D-B9828D4397CA}
+		{12437E7E-3084-4512-98BF-7923DEF29661} = {56526028-5F97-48CF-85B8-24871FE57DA9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A5B74E53-80E5-4A61-8517-DC97B10FE3F8}

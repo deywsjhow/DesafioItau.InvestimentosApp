@@ -4,7 +4,7 @@ using DesafioItau.InvestimentosApp.Repository.DbAtivosContext;
 
 namespace DesafioItau.InvestimentosApp.Domain.Ativos
 {
-    public class AtivosService(IAtivosContext ativosContext, ICotacoesContext cotacoesContext) : IUsuariosService
+    public class AtivosService(IAtivosContext ativosContext, ICotacoesContext cotacoesContext) : IAtivosService
     {
         public async Task<AtivosResponse> GetAtivo(string codigo)
         {

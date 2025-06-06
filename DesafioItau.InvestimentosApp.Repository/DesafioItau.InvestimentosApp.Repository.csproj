@@ -16,8 +16,4 @@
     <ProjectReference Include="..\DesafioItau.InvestimentosApp.Common\DesafioItau.InvestimentosApp.Common.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="DbUsuariosContext - Copy\" />
-  </ItemGroup>
-
 </Project>
