@@ -13,6 +13,7 @@ namespace DesafioItau.InvestimentosApp.Test.Controllers
 {
     public class UsuariosControllerTest
     {
+        #region TesteConsultaPrecoMedioAtivoPorUsuario
         [Fact]
         public async Task ConsultaPrecoMedioAtivoPorUsuario_ReturnsOk_WhenSuccess()
         {
@@ -88,8 +89,9 @@ namespace DesafioItau.InvestimentosApp.Test.Controllers
             // Assert
             mockService.Verify(s => s.GetPrecoMedioAsync(123, "CODE"), Times.Once);
         }
-        //Fm testes preco medio
+        #endregion
 
+        #region TesteConsultaPosicoesAsync
         [Fact]
         public async Task ConsultaPosicoesAsync_ReturnsOk_WhenSuccess()
         {
@@ -150,8 +152,9 @@ namespace DesafioItau.InvestimentosApp.Test.Controllers
 
             mockService.Verify(s => s.GetPosicao(99), Times.Once);
         }
-        //fim testes consulta posicoes
+        #endregion
 
+        #region TesteConsultaCorregatemTotal
         [Fact]
         public async Task ConsultaCorretagemTotal_ReturnsOk_WhenSuccess()
         {
@@ -212,8 +215,9 @@ namespace DesafioItau.InvestimentosApp.Test.Controllers
 
             mockService.Verify(s => s.GetCorretagemTotal(77), Times.Once);
         }
-        // fim dos testes corretagem total
+        #endregion
 
+        #region TesteGetPosicoesTotal
         [Fact]
         public async Task GetPosicoesTotal_ReturnsOk_WhenSuccess()
         {
@@ -274,8 +278,9 @@ namespace DesafioItau.InvestimentosApp.Test.Controllers
 
             mockService.Verify(s => s.GetPosicaoTotal(), Times.Once);
         }
-        // fim dos testes posicao total
+        #endregion
 
+        #region TesteGetCorretagemTotal
         [Fact]
         public async Task GetCorretagemTotal_ReturnsOk_WhenSuccess()
         {
@@ -348,5 +353,6 @@ namespace DesafioItau.InvestimentosApp.Test.Controllers
             // Assert
             mockService.Verify(s => s.GetCorretagemTotal(), Times.Once);
         }
+        #endregion
     }
 }
