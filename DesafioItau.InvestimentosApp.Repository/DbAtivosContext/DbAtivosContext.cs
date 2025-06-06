@@ -7,18 +7,18 @@ using System.Data;
 
 namespace DesafioItau.InvestimentosApp.Repository.DbAtivosContext
 {
-    public class DbCotacoesContext : IAtivosContext
+    public class DbAtivosContext : IAtivosContext
     {
         private readonly string _connectionString;
-        private readonly ILogger<DbCotacoesContext> _logger;
+        private readonly ILogger<DbAtivosContext> _logger;
 
-        public DbCotacoesContext(IConfiguration configuration, ILogger<DbCotacoesContext> logger)
+        public DbAtivosContext(IConfiguration configuration, ILogger<DbAtivosContext> logger)
         {
             _connectionString = configuration.GetConnectionString("DefaultConnection")!;
             _logger = logger;
         }
 
-        private IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
 
         public async Task<RetornoAtivosBD?> GetAtivo(string codigo)
         {

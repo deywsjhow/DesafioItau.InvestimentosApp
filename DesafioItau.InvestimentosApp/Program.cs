@@ -1,15 +1,26 @@
+using DesafioItau.InvestimentosApp.Domain.Ativos;
+using DesafioItau.InvestimentosApp.Domain.Usuarios;
+using DesafioItau.InvestimentosApp.Repository.DbAtivosContext;
+using DesafioItau.InvestimentosApp.Repository.DbCotacoesContext;
+using DesafioItau.InvestimentosApp.Repository.DbUsuariosContext;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Injeção de dependências do contexto e serviços
+builder.Services.AddScoped<IAtivosContext, DbAtivosContext>();
+builder.Services.AddScoped<ICotacoesContext, DbCotacoesContext>();
+builder.Services.AddScoped<IUsuariosContext, DbUsuariosContext>();
 
+builder.Services.AddScoped<IAtivosService, AtivosService>();
+builder.Services.AddScoped<IUsuariosService, UsuariosService>();
+
+// Demais configurações padrão
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -17,9 +28,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();

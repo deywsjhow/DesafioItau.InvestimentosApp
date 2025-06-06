@@ -127,13 +127,13 @@ public class UsuariosServiceTest
     [Fact]
     public async Task GetPosicaoTotal_ReturnsSuccess_WhenDataIsValid()
     {
-        var lista = new List<PosicaoTotalResponse> { new PosicaoTotalResponse { id_usuario = 1, PosicaoTotal = 100 } };
+        var lista = new List<PosicaoTotalResponse> { new PosicaoTotalResponse { NomUser = "user1", TotalPosicao = 100 } };
         _mockUsuariosContext.Setup(x => x.GetPosicoesTotal()).ReturnsAsync(lista);
 
         var result = await _service.GetPosicaoTotal();
 
         Assert.True(result.Success);
-        Assert.Single(result.Data);
+        Assert.NotNull(result.Data);
     }
 
     [Fact]

@@ -19,7 +19,7 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
             _logger = logger;
         }
 
-        private IDbConnection Connection() => new SqlConnection(_connectionString);
+        private SqlConnection Connection() => new SqlConnection(_connectionString);
 
         public async Task<UsuarioPrecoMedioResponse?> GetPrecoMedioAsync(int UsuarioId, string AtivoId)
         {

@@ -19,7 +19,7 @@ namespace DesafioItau.InvestimentosApp.Repository.DbCotacoesContext
             _logger = logger;
         }
 
-        private IDbConnection CreateConnection() => new SqlConnection(_connectionString);
+        private SqlConnection CreateConnection() => new SqlConnection(_connectionString);
 
         public async Task<RetornoCotacoesBD?> GetCotacao(int id)
         {
@@ -36,7 +36,7 @@ namespace DesafioItau.InvestimentosApp.Repository.DbCotacoesContext
             }
             catch (Exception ex)
             {
-                _logger.LogWarning("ID inválido para cotação: {Id}", id);
+                _logger.LogError(ex, "ID inválido para cotação: {Id}", id);
                 return null;
             }
         }

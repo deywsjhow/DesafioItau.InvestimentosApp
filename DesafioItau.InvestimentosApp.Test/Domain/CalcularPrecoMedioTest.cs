@@ -1,5 +1,6 @@
 ﻿using DesafioItau.InvestimentosApp.Common.Models;
 using DesafioItau.InvestimentosApp.Domain;
+using Moq;
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -37,7 +38,7 @@ namespace DesafioItau.Tests.Domain
         public void Calcular_DeveLancarExcecao_ListaVazia()
         {
             // Act & Assert  
-            var ex = Assert.Throws<ArgumentException>(() => CalcularPrecoMedio.Calcular(null!));
+            var ex = Assert.Throws<ArgumentException>(() => CalcularPrecoMedio.Calcular([]));
             Assert.Equal("operacaoCompras", ex.ParamName);
         }
 
