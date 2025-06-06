@@ -1,80 +1,67 @@
-﻿
-
-using DesafioItau.InvestimentosApp.Common.Models.UsuariosModel;
+﻿using DesafioItau.InvestimentosApp.Common.Models.UsuariosModel;
 using DesafioItau.InvestimentosApp.Repository.DbUsuariosContext;
 
 namespace DesafioItau.InvestimentosApp.Domain.Usuarios
 {
     public class UsuariosService(IUsuariosContext usuariosContext) : IUsuariosService
     {
-        public async Task<UsuarioPrecoMedioResponse> GetPrecoMedioAsync(int UsuarioId, string AtivoId)
+        public async Task<ServiceResult<UsuarioPrecoMedioResponse>> GetPrecoMedioAsync(int usuarioId, string ativoId)
         {
+            if (usuarioId <= 0 || string.IsNullOrEmpty(ativoId))
+                return ServiceResult<UsuarioPrecoMedioResponse>.Fail("ID do usuário ou código do ativo inválido.");
 
-            if (UsuarioId.ToString() is null && AtivoId is null || UsuarioId <= 0)
-                return new UsuarioPrecoMedioResponse();
-
-            //chama get precomedio para recuperar as infos
-            var ret = await usuariosContext.GetPrecoMedioAsync(UsuarioId, AtivoId);
+            var ret = await usuariosContext.GetPrecoMedioAsync(usuarioId, ativoId);
 
             if (ret is null)
-                return new UsuarioPrecoMedioResponse();
+                return ServiceResult<UsuarioPrecoMedioResponse>.Fail("Nenhum preço médio encontrado para o usuário e ativo informados.");
 
-
-            return ret;
+            return ServiceResult<UsuarioPrecoMedioResponse>.Ok(ret);
         }
 
-        public async Task<IEnumerable<PosicaoResponse>> GetPosicao(int usuarioId)
+        public async Task<ServiceResult<IEnumerable<PosicaoResponse>>> GetPosicao(int usuarioId)
         {
-            IEnumerable<PosicaoResponse> result = new List<PosicaoResponse>();
-
-            if (usuarioId.ToString() is null || usuarioId <= 0)
-                return result;
+            if (usuarioId <= 0)
+                return ServiceResult<IEnumerable<PosicaoResponse>>.Fail("ID do usuário inválido.");
 
             var ret = await usuariosContext.ObterPosicoesAsync(usuarioId);
 
-            if (ret is null)
-                return result;
+            if (ret is null || !ret.Any())
+                return ServiceResult<IEnumerable<PosicaoResponse>>.Fail("Nenhuma posição encontrada para o usuário.");
 
-            return ret;
+            return ServiceResult<IEnumerable<PosicaoResponse>>.Ok(ret);
         }
 
-        public async Task<CorretagemTotalResponse> GetCorretagemTotal(int UsuarioId)
+        public async Task<ServiceResult<CorretagemTotalResponse>> GetCorretagemTotal(int usuarioId)
         {
+            if (usuarioId <= 0)
+                return ServiceResult<CorretagemTotalResponse>.Fail("ID do usuário inválido.");
 
-            if (UsuarioId.ToString() is null || UsuarioId <= 0)
-                return new CorretagemTotalResponse();
-
-            //chama get precomedio para recuperar as infos
-            var ret = await usuariosContext.GetCorretagemTotal(UsuarioId);
+            var ret = await usuariosContext.GetCorretagemTotal(usuarioId);
 
             if (ret is null)
-                return new CorretagemTotalResponse();
+                return ServiceResult<CorretagemTotalResponse>.Fail("Nenhuma corretagem encontrada para o usuário.");
 
-
-            return ret;
+            return ServiceResult<CorretagemTotalResponse>.Ok(ret);
         }
 
-        public async Task<IEnumerable<PosicaoTotalResponse>> GetPosicaoTotal()
+        public async Task<ServiceResult<IEnumerable<PosicaoTotalResponse>>> GetPosicaoTotal()
         {
-            IEnumerable<PosicaoTotalResponse> result = new List<PosicaoTotalResponse>();
-
             var ret = await usuariosContext.GetPosicoesTotal();
 
-            if (ret is null)
-                return result;
+            if (ret is null || !ret.Any())
+                return ServiceResult<IEnumerable<PosicaoTotalResponse>>.Fail("Nenhuma posição total encontrada.");
 
-            return ret;
+            return ServiceResult<IEnumerable<PosicaoTotalResponse>>.Ok(ret);
         }
-        public async Task<IEnumerable<CorretagemTotalResponse>> GetCorretagemTotal()
-        {
-            IEnumerable<CorretagemTotalResponse> result = new List<CorretagemTotalResponse>();
 
+        public async Task<ServiceResult<IEnumerable<CorretagemTotalResponse>>> GetCorretagemTotal()
+        {
             var ret = await usuariosContext.GetCorretagemTotal();
 
-            if (ret is null)
-                return result;
+            if (ret is null || !ret.Any())
+                return ServiceResult<IEnumerable<CorretagemTotalResponse>>.Fail("Nenhuma corretagem total encontrada.");
 
-            return ret;
+            return ServiceResult<IEnumerable<CorretagemTotalResponse>>.Ok(ret);
         }
     }
 }

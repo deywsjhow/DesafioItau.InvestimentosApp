@@ -44,4 +44,32 @@ public class AtivosControllerTests
         Assert.IsType<BadRequestObjectResult>(result);
     }
 
+    [Fact]
+    public async Task ConsultaUltimaCotacaoAtivo_ReturnsBadRequest_WhenCodigoIsNullOrEmpty()
+    {
+        var mockService = new Mock<IAtivosService>();
+        var controller = new AtivosController();
+
+        var resultNull = await controller.ConsultaUltimaCotacaoAtivo(null!, mockService.Object);
+        var resultEmpty = await controller.ConsultaUltimaCotacaoAtivo("", mockService.Object);
+
+        Assert.IsType<BadRequestObjectResult>(resultNull);
+        Assert.IsType<BadRequestObjectResult>(resultEmpty);
+    }
+
+    [Fact]
+    public async Task ConsultaUltimaCotacaoAtivo_CallsGetAtivo_Once()
+    {
+        var mockService = new Mock<IAtivosService>();
+        var codigo = "ITSA4";
+        mockService.Setup(s => s.GetAtivo(codigo)).ReturnsAsync(new AtivosResponse());
+
+        var controller = new AtivosController();
+
+        await controller.ConsultaUltimaCotacaoAtivo(codigo, mockService.Object);
+
+        mockService.Verify(s => s.GetAtivo(codigo), Times.Once());
+    }
+
+
 }

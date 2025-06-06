@@ -1,8 +1,8 @@
 ﻿using DesafioItau.InvestimentosApp.Common.Models.UsuariosModel;
 using DesafioItau.InvestimentosApp.Domain.Usuarios;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace DesafioItau.InvestimentosApp.Controllers
 {
@@ -15,13 +15,12 @@ namespace DesafioItau.InvestimentosApp.Controllers
         [ProducesResponseType(typeof(UsuarioPrecoMedioResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> ConsultaPrecoMedioAtivoPorUsuario(int usuarioId, string codigo, IUsuariosService usuariosService)
         {
-            //implementar a chamada do usuariosService
             var result = await usuariosService.GetPrecoMedioAsync(usuarioId, codigo);
 
-            if (result is null)
-                return BadRequest("Não foi encontrado o ativo informado para este usuário para retorno do cálculo.");
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
         [HttpGet("{usuarioId}/posicoes")]
@@ -31,51 +30,49 @@ namespace DesafioItau.InvestimentosApp.Controllers
         {
             var result = await usuariosService.GetPosicao(usuarioId);
 
-            if (result is null)
-                return BadRequest("Não foi encontrada posicoes para este usuário");
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
-            return Ok(result);  
+            return Ok(result.Data);
         }
 
         [HttpGet("{usuarioId}/corretagem")]
-        [ProducesResponseType(typeof(PosicaoResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(PosicaoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CorretagemTotalResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CorretagemTotalResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> ConsultaCorretagemTotal(int usuarioId, IUsuariosService usuariosService)
         {
             var result = await usuariosService.GetCorretagemTotal(usuarioId);
 
-            if (result is null)
-                return BadRequest("Não foi possivel calcular o valor das corretagens desse usuário");
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
         [HttpGet("total/posicoes")]
-        [ProducesResponseType(typeof(PosicaoResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(PosicaoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PosicaoTotalResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(PosicaoTotalResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> GetPosicoesTotal(IUsuariosService usuariosService)
         {
             var result = await usuariosService.GetPosicaoTotal();
 
-            if (result is null)
-                return BadRequest("Não foi encontrada posicoes para calcular o total");
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
-            return Ok(result);
+            return Ok(result.Data);
         }
 
-
         [HttpGet("total/corretagem")]
-        [ProducesResponseType(typeof(PosicaoResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(PosicaoResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(CorretagemTotalResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(CorretagemTotalResponse), StatusCodes.Status200OK)]
         public async Task<ActionResult> GetCorretagemTotal(IUsuariosService usuariosService)
         {
             var result = await usuariosService.GetCorretagemTotal();
 
-            if (result is null)
-                return BadRequest("Não foi encontrada corretagem para calcular o total");
+            if (!result.Success)
+                return BadRequest(result.ErrorMessage);
 
-            return Ok(result);
+            return Ok(result.Data);
         }
-
     }
 }

@@ -6,7 +6,7 @@ namespace DesafioItau.InvestimentosApp.Domain.Ativos
 {
     public class AtivosService(IAtivosContext ativosContext, ICotacoesContext cotacoesContext) : IAtivosService
     {
-        public async Task<AtivosResponse> GetAtivo(string codigo)
+        public async Task<AtivosResponse?> GetAtivo(string codigo)
         {
             var AtivosResponse = new AtivosResponse();
 
