@@ -10,7 +10,7 @@ namespace DesafioItau.Tests.Domain
     public class CalcularPrecoMedioTest
     {
         [Fact]
-        public void Calcular_DeveCalcularPrecoMedioCorretamente()
+        public async Task Calcular_DeveCalcularPrecoMedioCorretamente()
         {
             // Arrange  
             var operacoes = new List<OperacaoCompra>
@@ -20,30 +20,30 @@ namespace DesafioItau.Tests.Domain
                };
 
             // Act  
-            var precoMedio = CalcularPrecoMedio.Calcular(operacoes);
+            var precoMedio = await CalcularPrecoMedio.Calcular(operacoes);
 
             // Assert  
             Assert.Equal(26.6667m, Math.Round(precoMedio, 4));
         }
 
         [Fact]
-        public void Calcular_DeveLancarExcecao_ListaNula()
+        public async Task Calcular_DeveLancarExcecao_ListaNula()
         {
             // Act & Assert  
-            var ex = Assert.Throws<ArgumentNullException>(() => CalcularPrecoMedio.Calcular(null!));
+            var ex = await Assert.ThrowsAsync<ArgumentNullException>(() => CalcularPrecoMedio.Calcular(null!));
             Assert.Equal("operacaoCompras", ex.ParamName);
         }
 
         [Fact]
-        public void Calcular_DeveLancarExcecao_ListaVazia()
+        public async Task Calcular_DeveLancarExcecao_ListaVazia()
         {
             // Act & Assert  
-            var ex = Assert.Throws<ArgumentException>(() => CalcularPrecoMedio.Calcular([]));
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() => CalcularPrecoMedio.Calcular([]));
             Assert.Equal("operacaoCompras", ex.ParamName);
         }
 
         [Fact]
-        public void Calcular_DeveLancarExcecao_QuantidadeInvalida()
+        public async Task Calcular_DeveLancarExcecao_QuantidadeInvalida()
         {
             // Arrange  
             var operacoes = new List<OperacaoCompra>
@@ -52,36 +52,36 @@ namespace DesafioItau.Tests.Domain
                };
 
             // Act & Assert  
-            var ex = Assert.Throws<ArgumentException>(() => CalcularPrecoMedio.Calcular(operacoes));
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() => CalcularPrecoMedio.Calcular(operacoes));
             Assert.Contains("A quantidade deve ser maior que zero", ex.Message);
         }
 
         [Fact]
-        public void Calcular_DeveLancarExcecao_PrecoUnitarioNegativo()
+        public async Task Calcular_DeveLancarExcecao_PrecoUnitarioNegativo()
         {
             // Arrange  
             var operacoes = new List<OperacaoCompra>
-               {
-                   new() { Quantidade = 10, PrecoUnitario = -5.0m }
-               };
+            {
+                new() { Quantidade = 10, PrecoUnitario = -5.0m }
+            };
 
             // Act & Assert  
-            var ex = Assert.Throws<ArgumentException>(() => CalcularPrecoMedio.Calcular(operacoes));
+            var ex = await Assert.ThrowsAsync<ArgumentException>(() => CalcularPrecoMedio.Calcular(operacoes));
             Assert.Contains("Preço unitário da operação não pode ser negativo", ex.Message);
         }
 
         [Fact]
-        public void Calcular_DeveLancarDivideByZero_SeTodasAsQuantidadesForemZeradas()
+        public async Task Calcular_DeveLancarDivideByZero_SeTodasAsQuantidadesForemZeradas()
         {
             // Arrange  
             var operacoes = new List<OperacaoCompra>
-               {
-                   new() { Quantidade = 0, PrecoUnitario = 5.0m },
-                   new() { Quantidade = 0, PrecoUnitario = 10.0m }
-               };
+            {
+                new() { Quantidade = 0, PrecoUnitario = 5.0m },
+                new() { Quantidade = 0, PrecoUnitario = 10.0m }
+            };
 
             // Act & Assert  
-            Assert.Throws<ArgumentException>(() => CalcularPrecoMedio.Calcular(operacoes));
+            await Assert.ThrowsAsync<ArgumentException>(() => CalcularPrecoMedio.Calcular(operacoes));
         }
     }
 }
