@@ -42,6 +42,17 @@ namespace DesafioItau.Tests.Domain
             Assert.Equal("operacaoCompras", ex.ParamName);
         }
 
+        /** 
+         Conceito de TesteMutante:
+            Teste Mutante é uma técnica de testes automatizados que cria versões alteradas do código original,
+            mudando pequenas partes para verificar se os testes existentes conseguem detectar essas alterações. 
+
+        Importância:
+            Ele ajuda a garantir a qualidade dos seus testes automatizados, 
+            demonstrando se o mesmo é capaz de averiguar erros reais no código.
+
+         **/
+
         [Fact]
         public async Task Calcular_DeveLancarExcecao_QuantidadeInvalida()
         {
@@ -82,6 +93,6 @@ namespace DesafioItau.Tests.Domain
 
             // Act & Assert  
             await Assert.ThrowsAsync<ArgumentException>(() => CalcularPrecoMedio.Calcular(operacoes));
-        }
+        }      
     }
 }
