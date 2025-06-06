@@ -1,48 +1,44 @@
 ﻿using DesafioItau.InvestimentosApp.Common.Models.AtivosModels;
+using DesafioItau.InvestimentosApp.Repository.DbAtivosContext;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data;
-using Dapper;
-using DesafioItau.InvestimentosApp.Repository.DbAtivosContext;
 
 namespace DesafioItau.InvestimentosApp.Repository.DbCotacoesContext
 {
-    public class DbCotacoesContext(IConfiguration configuration) : ICotacoesContext
+    public class DbCotacoesContext : ICotacoesContext
     {
-        private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection");
+        private readonly string _connectionString;
+        private readonly ILogger<DbCotacoesContext> _logger;
 
-        public IDbConnection Connection()
+        public DbCotacoesContext(IConfiguration configuration, ILogger<DbCotacoesContext> logger)
         {
-            return new SqlConnection(_connectionString);
+            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _logger = logger;
         }
 
+        private IDbConnection CreateConnection() => new SqlConnection(_connectionString);
 
-        public async Task<RetornoCotacoesBD> GetCotacao(int id)
+        public async Task<RetornoCotacoesBD?> GetCotacao(int id)
         {
-            var result = new RetornoCotacoesBD();
+            const string sql = @"
+                SELECT TOP 1 id, id_ativo, preco_unitario, data_hora
+                   FROM [dbo].[Cotacoes] 
+                      WITH (NOLOCK, INDEX (Ind_Cotacoes_01))
+                WHERE id_ativo = @Id";
 
             try
             {
-                using var connectionDB = this.Connection();
-                connectionDB.Open();
-
-                string sql = @"SELECT id, id_ativo, preco_unitario, data_hora
-                                  FROM [dbo].[Cotacoes]
-                                     WITH (NOLOCK, INDEX (Ind_Cotacoes_01))
-                                  WHERE id_ativo = @Id
-                                  LIMIT 1";
-
-                var cotacao = await connectionDB.QueryFirstOrDefaultAsync<RetornoCotacoesBD>(sql, new {Id = id});
-
-                if (cotacao != null) 
-                    result = cotacao;     
-
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<RetornoCotacoesBD>(sql, new { Id = id });
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
+                _logger.LogWarning("ID inválido para cotação: {Id}", id);
+                return null;
             }
-
-            return result;
         }
-
     }
 }

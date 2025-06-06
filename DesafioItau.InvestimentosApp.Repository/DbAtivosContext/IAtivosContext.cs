@@ -9,6 +9,6 @@ namespace DesafioItau.InvestimentosApp.Repository.DbAtivosContext
 {
     public interface IAtivosContext
     {
-        Task<RetornoAtivosBD> GetAtivo(string codigo);
+        Task<RetornoAtivosBD?> GetAtivo(string codigo);
     }
 }

@@ -1,47 +1,49 @@
 ﻿using DesafioItau.InvestimentosApp.Common.Models.AtivosModels;
+using Dapper;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Data;
-using Dapper;
 
 namespace DesafioItau.InvestimentosApp.Repository.DbAtivosContext
 {
-    public class DbCotacoesContext(IConfiguration configuration) : IAtivosContext
+    public class DbCotacoesContext : IAtivosContext
     {
-        private readonly string _connectionString = configuration.GetConnectionString("DefaultConnection");
+        private readonly string _connectionString;
+        private readonly ILogger<DbCotacoesContext> _logger;
 
-        public IDbConnection Connection()
+        public DbCotacoesContext(IConfiguration configuration, ILogger<DbCotacoesContext> logger)
         {
-            return new SqlConnection(_connectionString);
+            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _logger = logger;
         }
 
+        private IDbConnection CreateConnection() => new SqlConnection(_connectionString);
 
-        public async Task<RetornoAtivosBD> GetAtivo(string codigo)
+        public async Task<RetornoAtivosBD?> GetAtivo(string codigo)
         {
-            var result = new RetornoAtivosBD();
+            if (string.IsNullOrWhiteSpace(codigo))
+            {
+                _logger.LogWarning("Código do ativo não informado.");
+                return null;
+            }
+
+            const string sql = @"
+                SELECT TOP 1 id, codigo, nome
+                    FROM [dbo].[Ativos] 
+                        WITH (NOLOCK, INDEX (Ind_Ativos_01))
+                WHERE codigo = @Codigo";
 
             try
             {
-                using var connectionDB = this.Connection();
-                connectionDB.Open();
-
-                string sql = @"SELECT id, codigo, nome
-                                  FROM [dbo].[Ativos]
-                                     WITH (NOLOCK, INDEX (Ind_Ativos_01))
-                                  WHERE codigo = @Codigo
-                                  LIMIT 1";
-
-                var ativo = await connectionDB.QueryFirstOrDefaultAsync<RetornoAtivosBD>(sql, new {Codigo = codigo});
-
-                if (ativo != null) 
-                    result = ativo;     
-
+                using var connection = CreateConnection();
+                return await connection.QueryFirstOrDefaultAsync<RetornoAtivosBD>(sql, new { Codigo = codigo });
             }
-            catch (Exception ex) { 
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao buscar ativo com código {Codigo}", codigo);
+                return null;
             }
-
-            return result;
         }
-
     }
 }

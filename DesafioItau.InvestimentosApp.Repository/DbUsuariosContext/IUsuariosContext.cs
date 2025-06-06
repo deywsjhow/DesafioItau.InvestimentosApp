@@ -10,9 +10,9 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
 {
     public interface IUsuariosContext
     {
-        Task<UsuarioPrecoMedioResponse> GetPrecoMedioAsync(int UsuarioId, string AtivoId);
+        Task<UsuarioPrecoMedioResponse?> GetPrecoMedioAsync(int UsuarioId, string AtivoId);
         Task<IEnumerable<PosicaoResponse>> ObterPosicoesAsync(int UsuarioId);
-        Task<CorretagemTotalResponse> GetCorretagemTotal(int UsuarioId);
+        Task<CorretagemTotalResponse?> GetCorretagemTotal(int UsuarioId);
         Task<IEnumerable<PosicaoTotalResponse>> GetPosicoesTotal();
         Task<IEnumerable<CorretagemTotalResponse>> GetCorretagemTotal();
     }

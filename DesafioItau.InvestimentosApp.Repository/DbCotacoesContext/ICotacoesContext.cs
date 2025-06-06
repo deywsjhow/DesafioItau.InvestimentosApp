@@ -9,6 +9,6 @@ namespace DesafioItau.InvestimentosApp.Repository.DbAtivosContext
 {
     public interface ICotacoesContext
     {
-        Task<RetornoCotacoesBD> GetCotacao(int id);
+        Task<RetornoCotacoesBD?> GetCotacao(int id);
     }
 }
