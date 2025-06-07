@@ -17,26 +17,18 @@ namespace DesafioItau.InvestimentosApp.CotacoesConsumer
         private readonly AsyncPolicy _policyExecutora;
         private readonly IAtivosContext _ativosContext;
         private readonly ICotacoesContext _cotacoesContext;
+        private readonly ConsumerConfig _consumerConfig;
 
-        public Worker(ILogger<Worker> logger, IConfiguration configuration, IAtivosContext ativosContext, ICotacoesContext cotacoesContext)
+        public Worker(ILogger<Worker> logger, IConfiguration configuration, IAtivosContext ativosContext, ICotacoesContext cotacoesContext, ConsumerConfig consumerConfig, IConsumer<Ignore, string> consumer)
         {
             _logger = logger;
             _ativosContext = ativosContext;
             _cotacoesContext = cotacoesContext;
+            _consumerConfig = consumerConfig;
+            _consumer = consumer;
 
             var kafkaConfig = configuration.GetSection("Kafka");
-
-            var consumerConfig = new ConsumerConfig
-            {
-                BootstrapServers = kafkaConfig.GetValue<string>("BootstrapServers"),
-                GroupId = kafkaConfig.GetValue<string>("GroupId"),
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = kafkaConfig.GetValue<bool>("EnableAutoCommit")
-            };
-
             _topic = kafkaConfig.GetValue<string>("Topic");
-
-            _consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build();
             _consumer.Subscribe(_topic);
 
             // Retry 3 tentativas
