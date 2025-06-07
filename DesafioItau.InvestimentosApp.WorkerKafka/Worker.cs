@@ -14,6 +14,7 @@ namespace DesafioItau.InvestimentosApp.CotacoesConsumer
         private readonly IConsumer<Ignore, string> _consumer;
         private readonly string _topic;
         private readonly AsyncRetryPolicy _retryPolicy;
+        private readonly AsyncPolicy _policyExecutora;
         private readonly IAtivosContext _ativosContext;
         private readonly ICotacoesContext _cotacoesContext;
 
@@ -42,8 +43,38 @@ namespace DesafioItau.InvestimentosApp.CotacoesConsumer
             _retryPolicy = Policy.Handle<Exception>()
                 .WaitAndRetryAsync(3,
                     attempt => TimeSpan.FromSeconds(Math.Pow(2, attempt)),
-                    (ex, delay, count, ctx) => _logger.LogWarning($"Tentativa {count} falhou: {ex.Message}. Retry em {delay.TotalSeconds}s."));
+                    (ex, delay, count, ctx) => _logger.LogWarning("Tentativa {tentativa} falhou: {mensagem}. Retry em {tempo}.", count, ex.Message, delay.TotalSeconds));
 
+            var fallbackPolicy = Policy
+                .Handle<Exception>()
+                .FallbackAsync(
+                     fallbackAction: async (ct) =>
+                     {
+                         _logger.LogError("Falha definitiva no processamento da mensagem após todas as tentativas. Executando fallback.");
+                         await Task.CompletedTask;
+                     },
+                     onFallbackAsync: async (ex) => 
+                     {
+                         _logger.LogError(ex.Message); 
+                         await Task.CompletedTask;
+                     });
+
+            var circuitBreakerPolicy = Policy.Handle<Exception>()
+                .CircuitBreakerAsync(
+                    exceptionsAllowedBeforeBreaking: 3,
+                    durationOfBreak: TimeSpan.FromSeconds(30),
+                    onBreak: (ex, breakDelay) =>
+                    {
+                        _logger.LogWarning("Circuit breaker aberto por {BreakDelay} devido a: {Exception}", breakDelay, ex.Message);
+                    },
+                    onReset: () =>
+                    {
+                        _logger.LogInformation("Circuit breaker resetado. Tentando novamente.");
+                    });                  
+
+
+            var combinedCircuitRetry = circuitBreakerPolicy.WrapAsync(_retryPolicy);
+            _policyExecutora = fallbackPolicy.WrapAsync(combinedCircuitRetry);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -59,7 +90,7 @@ namespace DesafioItau.InvestimentosApp.CotacoesConsumer
                         var consumeResult = _consumer.Consume(stoppingToken);
                         _logger.LogInformation("Mensagem recebida {msg}:", consumeResult.Message.Value);
 
-                        await _retryPolicy.ExecuteAsync(async () =>
+                        await _policyExecutora.ExecuteAsync(async () =>
                         {
                             await ProcessarMensagemAsync(consumeResult.Message.Value);
                         });
