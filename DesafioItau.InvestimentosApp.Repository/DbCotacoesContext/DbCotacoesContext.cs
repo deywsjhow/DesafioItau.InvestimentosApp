@@ -5,6 +5,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Data;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DesafioItau.InvestimentosApp.Repository.DbCotacoesContext
 {
@@ -62,9 +63,42 @@ namespace DesafioItau.InvestimentosApp.Repository.DbCotacoesContext
             }
         }
 
-        public async Task<bool> InsereNovaCotacaoNaBase(int idAtivo, decimal precoUnitario, DateTime data)
+        public async Task<bool> InsereNovaCotacaoNaBaseInsUpd(int idAtivo, decimal precoUnitario, DateTime data)
         {
-            return true;
+            const string sql = @"
+                                
+                                UPDATE xx
+                                	SET xx.id_ativo		    = @IdAtivo,
+                                	    xx.preco_unitario   = @Preco,
+                                	    xx.data_hora		= @Data
+                                	FROM [dbo].[Cotacoes] xx
+                                		WITH (ROWLOCK, INDEX(Ind_Cotacoes_01))
+                                	WHERE xx.id_ativo = @IdAtivo
+                                GO                                
+                               
+                                INSERT INTO [dbo].[Cotacoes] (id_ativo, preco_unitario, data_hora)
+                                	SELECT tm.id_ativo, tm.preco_unitario, tm.data_hora
+                                		FROM #tmp_Cotacoes tm
+                                			WITH (NOLOCK)
+                                		WHERE NOT EXISTS (SELECT TOP 1 1
+                                									FROM [dbo].[Cotacoes] xx
+                                										WITH (NOLOCK, INDEX(Ind_Ativos_01))
+                                									WHERE xx.id_ativo = tm.id_ativo)
+                                ";
+
+            try
+            {
+                using var connection = CreateConnection();
+                await connection.ExecuteAsync(sql, new { IdAtivo = idAtivo, Preco = precoUnitario, Data = data });
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro ao inserir cotação na base: {Id}", idAtivo);
+                return false;
+            }
         }
     }
 }
+    

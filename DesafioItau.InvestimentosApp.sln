@@ -25,6 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CotacoesConsumer", "Cotacoe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesafioItau.InvestimentosApp.CotacoesConsumer", "DesafioItau.InvestimentosApp.WorkerKafka\DesafioItau.InvestimentosApp.CotacoesConsumer.csproj", "{D99ECAE2-B693-4DD0-B4D8-5B7D702AB478}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ConsoleApp", "ConsoleApp", "{13210E9A-DD52-45AE-B177-D4408755C2B8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesafioItau.InvestimentosApp.ConsoleApp", "DesafioItau.InvestimentosApp.ConsoleApp\DesafioItau.InvestimentosApp.ConsoleApp.csproj", "{9AA45134-1305-47BA-B189-54C7A90D5B37}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,10 @@ Global
 		{D99ECAE2-B693-4DD0-B4D8-5B7D702AB478}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D99ECAE2-B693-4DD0-B4D8-5B7D702AB478}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D99ECAE2-B693-4DD0-B4D8-5B7D702AB478}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AA45134-1305-47BA-B189-54C7A90D5B37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AA45134-1305-47BA-B189-54C7A90D5B37}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AA45134-1305-47BA-B189-54C7A90D5B37}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AA45134-1305-47BA-B189-54C7A90D5B37}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -65,6 +73,7 @@ Global
 		{1CBE7786-E579-4523-AA71-CC319EA29E15} = {12653F8A-E501-4B14-865D-B9828D4397CA}
 		{12437E7E-3084-4512-98BF-7923DEF29661} = {56526028-5F97-48CF-85B8-24871FE57DA9}
 		{D99ECAE2-B693-4DD0-B4D8-5B7D702AB478} = {AAB6AFA4-720F-4D96-9F2F-82AC85CD751E}
+		{9AA45134-1305-47BA-B189-54C7A90D5B37} = {13210E9A-DD52-45AE-B177-D4408755C2B8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A5B74E53-80E5-4A61-8517-DC97B10FE3F8}

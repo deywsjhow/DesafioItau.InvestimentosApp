@@ -135,9 +135,18 @@ namespace DesafioItau.InvestimentosApp.CotacoesConsumer
             }
 
             //Processando a mensagem na base
-            await _cotacoesContext.InsereNovaCotacaoNaBase(ativo.id, cotacao.Preco, DateTime.Now);
+           var result =  await _cotacoesContext.InsereNovaCotacaoNaBaseInsUpd(ativo.id, cotacao.Preco, DateTime.Now);
 
-            _logger.LogInformation("Cotação registrada com sucesso para o ativo {Ativo}", cotacao.Ativo);
+           if (result)
+           {
+               _logger.LogInformation("Cotação registrada com sucesso para o ativo {Ativo}", cotacao.Ativo);
+           }
+           else
+           {
+               _logger.LogError("Erro ao inserir a cotação na base {Ativo}", cotacao.Ativo);
+            }
+
+
         }
     }
 
