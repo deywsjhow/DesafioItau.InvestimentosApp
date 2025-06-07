@@ -21,7 +21,7 @@ public class AtivosServiceTests
     {
         // Arrange
         var codigo = "ITSA4";
-        var ativo = new RetornoAtivosBD { id = 1 };
+        var ativo = new RetornoAtivosBD { codigo = "ITSA4" };
         var cotacao = new RetornoCotacoesBD { id_ativo = 1, preco_unitario = 10.5m, data_hora = DateTime.Now };
 
         _mockAtivosContext.Setup(a => a.GetAtivo(codigo)).ReturnsAsync(ativo);
@@ -32,7 +32,7 @@ public class AtivosServiceTests
 
         // Assert
         Assert.True(result.Success);
-        Assert.Equal("1", result.Data?.Ativo);
+        Assert.Equal(codigo, result.Data?.Ativo);
         Assert.Equal(10.5m, result.Data?.Preco);
     }
 

@@ -20,7 +20,7 @@ namespace DesafioItau.InvestimentosApp.Domain.Ativos
 
             var response = new AtivosResponse
             {
-                Ativo = cotacao.id_ativo.ToString(),
+                Ativo = ativo.codigo,
                 Preco = cotacao.preco_unitario,
                 DataHora = cotacao.data_hora
             };

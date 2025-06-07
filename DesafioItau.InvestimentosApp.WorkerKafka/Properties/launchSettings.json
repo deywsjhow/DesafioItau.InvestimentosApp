@@ -1,7 +1,7 @@
 ﻿{
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "DesafioItau.InvestimentosApp.WorkerKafka": {
+    "DesafioItau.InvestimentosApp.CotacoesConsumer": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "environmentVariables": {
