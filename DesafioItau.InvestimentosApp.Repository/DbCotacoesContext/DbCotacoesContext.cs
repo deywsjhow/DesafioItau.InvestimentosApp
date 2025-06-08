@@ -73,17 +73,14 @@ namespace DesafioItau.InvestimentosApp.Repository.DbCotacoesContext
                                 	    xx.data_hora		= @Data
                                 	FROM [dbo].[Cotacoes] xx
                                 		WITH (ROWLOCK, INDEX(Ind_Cotacoes_01))
-                                	WHERE xx.id_ativo = @IdAtivo
-                                GO                                
+                                	WHERE xx.id_ativo = @IdAtivo                              
                                
                                 INSERT INTO [dbo].[Cotacoes] (id_ativo, preco_unitario, data_hora)
-                                	SELECT tm.id_ativo, tm.preco_unitario, tm.data_hora
-                                		FROM #tmp_Cotacoes tm
-                                			WITH (NOLOCK)
-                                		WHERE NOT EXISTS (SELECT TOP 1 1
-                                									FROM [dbo].[Cotacoes] xx
-                                										WITH (NOLOCK, INDEX(Ind_Ativos_01))
-                                									WHERE xx.id_ativo = tm.id_ativo)
+                                	SELECT @IdAtivo, @Preco, @Data                                		
+                                	WHERE NOT EXISTS (SELECT TOP 1 1
+                                					     FROM [dbo].[Cotacoes] xx
+                                					     	WITH (NOLOCK, INDEX(Ind_Cotacoes_01))
+                                					     WHERE xx.id_ativo = @IdAtivo)
                                 ";
 
             try

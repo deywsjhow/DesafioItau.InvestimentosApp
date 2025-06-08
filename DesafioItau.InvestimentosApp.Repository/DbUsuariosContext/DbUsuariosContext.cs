@@ -15,7 +15,7 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
 
         public DbUsuariosContext(IConfiguration configuration, ILogger<DbUsuariosContext> logger)
         {
-            _connectionString = configuration.GetConnectionString("DefaultConnection")!;
+            _connectionString = configuration.GetConnectionString("DefaultConnection");
             _logger = logger;
         }
 
@@ -28,13 +28,17 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
                                    FROM [dbo].[Operacoes] op 
                                        WITH (NOLOCK, INDEX(Ind_Operacoes_01))
                                    INNER JOIN [dbo].[Usuarios] us
-                                       WITH (NOLOCK INDEX (1)) ON us.id = op.id_usuario
+                                       WITH (NOLOCK INDEX (1)) 
+                                       ON us.id = op.id_usuario
                                    INNER JOIN [dbo].[Ativos] av
-                                       WITH (NOLOCK, INDEX (Ind_Ativos_01)) ON av.codigo = op.id_ativo
+                                       WITH (NOLOCK, INDEX (Ind_Ativos_01)) 
+                                       ON av.id = op.id_ativo
                                    WHERE op.id_usuario = @usuarioId
                                      AND op.id_ativo = @ativoId 
                                      AND op.tipo_operacao = 'c'
-                                     AND op.data_compra >= dateadd (day, -30, getdate ())";
+                                     AND op.data_compra >= dateadd (day, -30, getdate ())
+                                     GROUP BY us.nome, av.nome
+                                     ORDER BY av.nome";
 
             try
             {
@@ -56,11 +60,12 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
                                    FROM [dbo].[Posicoes] ps
                                        WITH (NOLOCK, INDEX (1))
                                    INNER JOIN [dbo].[Ativos] av
-                                       WITH (NOLOCK, INDEX (Ind_Ativos_01)) ON av.codigo = ps.id_ativo
+                                       WITH (NOLOCK, INDEX (Ind_Ativos_01)) 
+                                       ON av.id = ps.id_ativo
                                    OUTER APPLY (SELECT TOP 1 ct.Preco_Unitario
                                                   FROM [dbo].[Cotacoes] ct
                                                       WITH (NOLOCK, INDEX (Ind_Cotacoes_01))
-                                                  WHERE ct.Id_Ativo = av.Codigo
+                                                  WHERE ct.Id_Ativo = av.id
                                                   ORDER BY ct.data_hora DESC ) cs
                                    WHERE ps.id_usuario = @usuarioId";
 
@@ -83,8 +88,11 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
                                    FROM [dbo].[Operacoes] op
                                        WITH (NOLOCK, INDEX(Ind_Operacoes_01))
                                    INNER JOIN [dbo].[Usuarios] us
-                                       WITH (NOLOCK, INDEX (1)) ON us.id = op.id_usuario
-                                   WHERE id_usuario = @usuarioId";
+                                       WITH (NOLOCK, INDEX (1)) 
+                                       ON us.id = op.id_usuario
+                                   WHERE op.id_usuario = @usuarioId
+                                   GROUP BY us.nome
+								   ORDER BY 'TotalCorretagem'";
 
             try
             {
@@ -101,15 +109,19 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
 
         public async Task<IEnumerable<PosicaoTotalResponse>> GetPosicoesTotal()
         {
-            const string sql = @"SELECT ps.id_usuario, SUM(ps.quantidade * ca.preco_unitario) 'PosicaoTotal'
-                                   FROM [dbo].[posicoes] ps WITH (NOLOCK)
+            const string sql = @"SELECT us.nome 'NomUser', SUM(ps.quantidade * ca.preco_unitario) 'TotalPosicao'
+                                   FROM [dbo].[Posicoes] ps 
+                                      WITH (NOLOCK)
+                                   INNER JOIN [dbo].[Usuarios] us
+								      WITH (NOLOCK, INDEX(1))
+								      ON us.id = ps.id
                                    CROSS APPLY (SELECT TOP 1 cs.preco_unitario
                                                   FROM [dbo].[Cotacoes] cs
                                                       WITH (NOLOCK INDEX(Ind_Cotacoes_01))
                                                   WHERE cs.id_ativo = ps.id_ativo) ca                                          
-                                GROUP BY ps.id_usuario
-                                ORDER BY 'PosicaoTotal' DESC
-                                OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY";
+                                GROUP BY us.nome
+                                ORDER BY 'TotalPosicao' DESC
+                               ";
 
             try
             {
@@ -130,10 +142,10 @@ namespace DesafioItau.InvestimentosApp.Repository.DbUsuariosContext
                                    FROM [dbo].[Operacoes] op
                                        WITH (NOLOCK, INDEX(Ind_Operacoes_01))
                                    INNER JOIN [dbo].[Usuarios] us
-                                       WITH (NOLOCK, INDEX (1)) ON us.id = op.id_usuario
-                                GROUP BY op.id_usuario
-                                ORDER BY TotalCorretagem
-                                OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY";
+                                       WITH (NOLOCK, INDEX (1)) 
+                                       ON us.id = op.id_usuario
+                                GROUP BY us.nome
+                                ORDER BY 'TotalCorretagem' DESC";
 
             try
             {

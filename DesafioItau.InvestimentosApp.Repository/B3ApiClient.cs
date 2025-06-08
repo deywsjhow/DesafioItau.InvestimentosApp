@@ -1,5 +1,7 @@
 ﻿using DesafioItau.InvestimentosApp.Repository.DbAtivosContext;
 using DesafioItau.InvestimentosApp.Repository.DbCotacoesContext;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using System.Net.Http;
 using System.Text.Json;
 
@@ -7,31 +9,42 @@ public class B3ApiClient
 {
     private readonly HttpClient _httpClient;
     private readonly ICotacoesContext _cotacoesContext;
+    private readonly ILogger _logger;
 
-    public B3ApiClient(ICotacoesContext cotacoesContext)
+    public B3ApiClient(ICotacoesContext cotacoesContext, HttpClient httpClient, ILogger logger)
     {
         _cotacoesContext = cotacoesContext;
-
-        _httpClient = new HttpClient
-        {
-            BaseAddress = new Uri("https://b3api.vercel.app/api/Assets/")
-        };
+        _httpClient = httpClient;
+        _logger = logger;
     }
 
     public async Task<AssetInfo?> GetAssetAsync(string codigo)
     {
-        var response = await _httpClient.GetAsync(codigo);
-        response.EnsureSuccessStatusCode();
-
-        var json = await response.Content.ReadAsStringAsync();
-        using var doc = JsonDocument.Parse(json);
-        var root = doc.RootElement;
-
-        return new AssetInfo
+        try
         {
-            Price = root.GetProperty("price").GetDecimal(),
-            TradeTime = root.GetProperty("updatedAt").GetDateTime()
-        };
+            var response = await _httpClient.GetAsync(codigo);
+            response.EnsureSuccessStatusCode();
+
+            var json = await response.Content.ReadAsStringAsync();
+            var jsonDeserialize = JsonSerializer.Deserialize<AssetInfo>(json);
+
+            if (jsonDeserialize is null)
+                return null;
+
+            return new AssetInfo
+            {
+                price = jsonDeserialize.price,
+                tradetime = jsonDeserialize.tradetime
+            };
+
+        }
+        catch(HttpRequestException ex)
+        {
+            //_logger.LogError(ex, "Erro ao consultar a api da B3");
+            Console.WriteLine("Erro ao consultar a api da B3: {erro}", ex);
+            return null;
+        }
+        
     }
 
     public async Task InserirCotacoesAsync()
@@ -48,7 +61,7 @@ public class B3ApiClient
                     if (asset != null)
                     {
                         id = id + 1;                        
-                        await _cotacoesContext.InsereNovaCotacaoNaBaseInsUpd(id, asset.Price, asset.TradeTime);
+                        await _cotacoesContext.InsereNovaCotacaoNaBaseInsUpd(id, asset.price, asset.tradetime);
                     }
                 }
                 catch (Exception ex)

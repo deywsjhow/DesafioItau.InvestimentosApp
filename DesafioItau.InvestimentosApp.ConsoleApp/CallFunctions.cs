@@ -13,13 +13,19 @@ class CallFunctions
     static async Task Main(string[] args)
     {
         var configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 
         using var loggerFactory = LoggerFactory.Create(builder =>
         {
             builder.AddConsole();
         });
+
+        var httpClient = new HttpClient
+        {
+            BaseAddress = new Uri(configuration.GetValue<string>("UrlApiB3"))
+        };        
 
         var loggerAtivos = loggerFactory.CreateLogger<DbAtivosContext>();
         var loggerCotacoes = loggerFactory.CreateLogger<DbCotacoesContext>();
@@ -33,6 +39,12 @@ class CallFunctions
         // Instantiate services
         IAtivosService ativosService = new AtivosService(ativosContext, cotacoesContext);
         IUsuariosService usuariosService = new UsuariosService(usuariosContext);
+
+        var b3ApiClient = new B3ApiClient(cotacoesContext, httpClient, loggerFactory.CreateLogger<string>());
+
+        //Toda vez que rodar, popular a tabela de cotações.
+        await b3ApiClient.InserirCotacoesAsync();
+
 
         while (true)
         {
